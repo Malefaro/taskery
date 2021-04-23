@@ -3,4 +3,7 @@
 members = [
     "data-service",
     "server",
+    "models",
+    "postgres",
+    "mongodb",
 ]
