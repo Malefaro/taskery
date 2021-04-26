@@ -1,9 +1,7 @@
-use std::fs::{File};
+use std::fs::File;
 
-
-fn main() -> Result<(), std::io::Error>{
+fn main() -> Result<(), std::io::Error> {
     // here we can create schema file(for graphql-client) from query.
-
 
     // let f= File::create("./test.txt")?; // Thats works!
 

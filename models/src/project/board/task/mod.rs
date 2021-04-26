@@ -1,5 +1,5 @@
-pub mod history;
 pub mod comment;
+pub mod history;
 
 pub use comment::*;
 pub use history::*;

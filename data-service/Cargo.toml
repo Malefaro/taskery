@@ -8,3 +8,5 @@ edition = "2018"
 
 [dependencies]
 juniper = "0.15.4"
+diesel = { version = "1.4.6", features = ["postgres"] }
+models = {path = "../models"}

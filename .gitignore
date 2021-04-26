@@ -1,3 +1,6 @@
 target/
 */target/
 .vscode
+.env
+.idea/
+*/.DS_Store
