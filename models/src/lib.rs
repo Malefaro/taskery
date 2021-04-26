@@ -3,6 +3,7 @@ pub mod experience;
 pub mod project;
 pub mod settings;
 pub mod user;
+pub mod permissions;
 
 #[macro_use]
 extern crate diesel;
@@ -13,3 +14,4 @@ pub use experience::*;
 pub use project::*;
 pub use settings::*;
 pub use user::*;
+pub use permissions::*;

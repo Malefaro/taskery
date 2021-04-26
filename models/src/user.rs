@@ -1,8 +1,9 @@
-use juniper::{GraphQLObject};
+use juniper::GraphQLObject;
 use serde::{Deserialize, Serialize};
-use diesel::Queryable;
+use diesel::{Queryable, Identifiable};
 
-#[derive(GraphQLObject, Queryable, Serialize, Deserialize, Debug)]
+use crate::schema::*;
+#[derive(GraphQLObject, Identifiable, Queryable, Serialize, Deserialize, Debug)]
 pub struct User {
     pub id: i32,
     pub email: String,
