@@ -1,0 +1,31 @@
+-- This file should undo anything in `up.sql`
+-- drop table if exists companies;
+-- drop table if exists company_user_relations;
+-- drop table if exists experiences;
+-- drop table if exists projects;
+-- drop table if exists pages;
+-- drop table if exists boards;
+-- drop table if exists board_columns;
+-- drop table if exists tasks; 
+-- drop trigger if exists mdt_tasks;
+-- drop table if exists tags;
+-- drop trigger if exists mdt_tags;
+-- drop table if exists task_tag_relations;
+-- drop table if exists task_comments;
+-- drop trigger if exists mdt_task_comments;
+
+drop trigger if exists mdt_task_comments on task_comments;
+drop table if exists task_comments;
+drop table if exists task_tag_relations;
+drop trigger if exists mdt_tags on tags;
+drop table if exists tags;
+drop trigger if exists mdt_tasks on tasks;
+drop table if exists tasks; 
+drop table if exists board_columns;
+drop table if exists boards;
+drop table if exists pages;
+drop table if exists projects;
+drop table if exists experiences;
+drop table if exists company_user_relations;
+drop table if exists companies;
+drop EXTENSION if exists moddatetime;
