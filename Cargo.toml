@@ -6,4 +6,5 @@ members = [
     "models",
     "postgres",
     "mongodb",
+    "auth-service",
 ]
