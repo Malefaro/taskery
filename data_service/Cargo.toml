@@ -1,0 +1,25 @@
+[package]
+name = "data_service"
+version = "0.1.0"
+authors = ["malefaro <malefaro@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[features]
+# default=["mongo"]
+default=["postgres"]
+postgres = []
+mongo = []
+
+[dependencies]
+juniper = "0.15.4"
+# diesel = { version = "1.4.6", features = ["postgres"] }
+async-graphql = {version="2.8.4", features = ["chrono", "dataloader"]}
+
+serde = "1.0.125"
+chrono = {version="0.4.19", features = ["serde"]}
+# diesel = { version = "1.4.6", features = ["postgres", "chrono"] }
+
+async-trait = "0.1.50"
+diesel = { version = "1.4.6", features = ["postgres", "r2d2", "chrono"] }
+actix-web = "3.3.2"

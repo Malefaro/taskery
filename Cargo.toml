@@ -1,9 +1,7 @@
 [workspace]
 
 members = [
-    "data-service",
+    "data_service",
     "server",
-    "models",
-    "database", 
-    "auth-service",
+    "auth_service",
 ]
