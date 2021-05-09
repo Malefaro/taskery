@@ -1,8 +1,8 @@
-pub mod postgres;
 pub mod mongo;
+pub mod postgres;
 
-use async_trait::async_trait;
 use super::models::{Company, User};
+use async_trait::async_trait;
 
 type DatabaseResult<T> = Result<T, Box<dyn std::error::Error>>;
 

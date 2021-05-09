@@ -105,7 +105,7 @@ table! {
         id -> Int4,
         email -> Varchar,
         password -> Varchar,
-        is_admin -> Nullable<Bool>,
+        is_admin -> Bool,
     }
 }
 

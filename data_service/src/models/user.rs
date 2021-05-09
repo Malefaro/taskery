@@ -1,8 +1,8 @@
+use async_graphql::{ComplexObject, Result as GQLResult, SimpleObject};
+use diesel::{Identifiable, Insertable, Queryable};
 use serde::{Deserialize, Serialize};
-use diesel::{Queryable, Identifiable, Insertable};
-use async_graphql::{SimpleObject, ComplexObject, Result as GQLResult};
 
-use super::{Company, diesel_schema::*};
+use super::{diesel_schema::*, Company};
 #[derive(SimpleObject, Identifiable, Queryable, Serialize, Deserialize, Debug)]
 #[graphql(complex)]
 pub struct User {
@@ -20,7 +20,7 @@ impl User {
 }
 
 #[derive(Insertable)]
-#[table_name="users"]
+#[table_name = "users"]
 pub struct NewUser {
     pub email: String,
     pub password: String,

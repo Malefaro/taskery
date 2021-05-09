@@ -4,15 +4,15 @@ pub mod history;
 pub use comment::*;
 pub use history::*;
 
+use async_graphql::{ComplexObject, Result as GQLResult, SimpleObject};
 use chrono::NaiveDateTime;
-use async_graphql::{SimpleObject, ComplexObject, Result as GQLResult};
+use diesel::{Associations, Identifiable, Queryable};
 use serde::{Deserialize, Serialize};
-use diesel::{Queryable, Identifiable, Associations};
 
-use super::BoardColumn;
-use super::Board;
-use super::super::super::User;
 use super::super::super::diesel_schema::*;
+use super::super::super::User;
+use super::Board;
+use super::BoardColumn;
 
 // pub enum TaskStatus {
 //     Done,
@@ -21,11 +21,11 @@ use super::super::super::diesel_schema::*;
 // }
 #[derive(SimpleObject, Associations, Identifiable, Queryable, Serialize, Deserialize, Debug)]
 #[graphql(complex)]
-#[belongs_to(BoardColumn, foreign_key="column_id")]
-#[belongs_to(User, foreign_key="author_id")]
+#[belongs_to(BoardColumn, foreign_key = "column_id")]
+#[belongs_to(User, foreign_key = "author_id")]
 pub struct Task {
-    pub id: i32, 
-    pub name: String, 
+    pub id: i32,
+    pub name: String,
     pub text: String,
     // pub status: TaskStatus,
     pub resolved: bool,
@@ -47,11 +47,11 @@ impl Task {
 }
 
 #[derive(SimpleObject, Associations, Identifiable, Queryable, Serialize, Deserialize, Debug)]
-#[belongs_to(User, foreign_key="author_id")]
+#[belongs_to(User, foreign_key = "author_id")]
 #[belongs_to(Board)]
 pub struct Tag {
-    pub id: i32, 
-    pub name: String, 
+    pub id: i32,
+    pub name: String,
     pub color: String,
     pub exp: i32,
     pub board_id: i32,
@@ -64,7 +64,7 @@ pub struct Tag {
 #[belongs_to(Tag)]
 #[belongs_to(Task)]
 pub struct TaskTagRelation {
-    pub id: i32, 
+    pub id: i32,
     pub task_id: i32,
     pub tag_id: i32,
 }

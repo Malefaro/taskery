@@ -1,20 +1,20 @@
 use async_graphql::{Context, Object, Result as GQLResult};
 
-use crate::models::{Company, User}; 
+use crate::models::{Company, User};
 pub struct QueryRoot;
 
 #[Object]
 impl QueryRoot {
-    async fn users<'ctx>(&self, ctx:&Context<'ctx>) -> GQLResult<Vec<User>> {
+    async fn users<'ctx>(&self, ctx: &Context<'ctx>) -> GQLResult<Vec<User>> {
         unimplemented!()
     }
-    async fn user<'ctx>(&self, ctx:&Context<'ctx>, id: i32) -> GQLResult<User> {
+    async fn user<'ctx>(&self, ctx: &Context<'ctx>, id: i32) -> GQLResult<User> {
         unimplemented!()
     }
-    async fn companies<'ctx>(&self, ctx:&Context<'ctx>, user_id: i32) -> GQLResult<Vec<Company>> {
+    async fn companies<'ctx>(&self, ctx: &Context<'ctx>, user_id: i32) -> GQLResult<Vec<Company>> {
         unimplemented!()
     }
-    async fn company<'ctx>(&self, ctx:&Context<'ctx>, company_id: i32) -> GQLResult<User> {
+    async fn company<'ctx>(&self, ctx: &Context<'ctx>, company_id: i32) -> GQLResult<User> {
         unimplemented!()
     }
 }
@@ -43,7 +43,7 @@ impl QueryRoot {
 // }
 // impl Database for PSQL {
 //     fn get_obj(&self) {
-        
+
 //     }
 // }
 // pub struct Mongo {
@@ -51,10 +51,9 @@ impl QueryRoot {
 // }
 // impl Database for Mongo {
 //     fn get_obj(&self) {
-        
+
 //     }
 // }
-
 
 // #[cfg(feature="postgres")]
 // type Ctx = Context<PSQL>;
@@ -72,15 +71,13 @@ impl QueryRoot {
 //     }
 // }
 
-
-
 // struct MutationRoot;
 
 // #[test]
 // fn tst() {
 //     use juniper::{
-//         graphql_object, EmptyMutation, EmptySubscription, FieldResult, 
-//         GraphQLEnum, Variables, graphql_value, 
+//         graphql_object, EmptyMutation, EmptySubscription, FieldResult,
+//         GraphQLEnum, Variables, graphql_value,
 //     };
 //     let ctx = Context{db:PSQL{pool:1}};
 //     type Schema = juniper::RootNode<'static, QueryRoot, EmptyMutation<Context<PSQL>>, EmptySubscription<Context<PSQL>>>;
@@ -96,6 +93,5 @@ impl QueryRoot {
 //     ).unwrap();
 //     println!("{}", res);
 //     // Ensure the value matches.
-    
+
 // }
- 

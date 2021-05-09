@@ -9,7 +9,7 @@ message Token {
 }
 
 message UserID {
-    int64 userID = 1;
+    int32 userID = 1;
 }
 
 message Nothing {

@@ -1,9 +1,9 @@
 pub mod column;
 pub mod task;
 
-use async_graphql::{SimpleObject, ComplexObject, Result as GQLResult};
+use async_graphql::{ComplexObject, Result as GQLResult, SimpleObject};
+use diesel::{Associations, Identifiable, Queryable};
 use serde::{Deserialize, Serialize};
-use diesel::{Queryable, Identifiable, Associations};
 
 use super::super::diesel_schema::*;
 use super::Project;
@@ -12,8 +12,8 @@ use super::Project;
 #[graphql(complex)]
 #[belongs_to(Project)]
 pub struct Board {
-    pub id: i32, 
-    pub name: String, 
+    pub id: i32,
+    pub name: String,
     pub project_id: i32,
 }
 

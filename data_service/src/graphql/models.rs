@@ -12,7 +12,7 @@
 //     }
 // }
 
-// #[test] 
+// #[test]
 // fn test() {
 //     let schema = Schema::build(QueryRoot, EmptyMutation, EmptySubscription).data("hello".to_string()).finish();
 //     // let res = schema.execute("{ value }").await.into_result().unwrap().data;
