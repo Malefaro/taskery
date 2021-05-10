@@ -75,14 +75,14 @@ impl Redis {
 
 #[async_trait::async_trait]
 impl super::SessionManager for Redis {
-    async fn get_user_id_by_token(&self, token: String) -> Result<i32, Box<dyn std::error::Error>> {
+    async fn get_user_id_by_token(&self, token: &str) -> Result<i32, Box<dyn std::error::Error>> {
         let mut c = self.client.get_async_connection().await?;
         Ok(c.get(token).await?)
     }
 
     async fn set_token_for_user(
         &self,
-        token: String,
+        token: &str,
         user_id: i32,
     ) -> Result<(), Box<dyn std::error::Error>> {
         let mut c = self.client.get_async_connection().await?;
@@ -91,7 +91,7 @@ impl super::SessionManager for Redis {
         // Ok(c.set(token, user_id).await?.map(|_: i32|()))
     }
 
-    async fn delete_token(&self, token: String) -> Result<(), Box<dyn std::error::Error>> {
+    async fn delete_token(&self, token: &str) -> Result<(), Box<dyn std::error::Error>> {
         let mut c = self.client.get_async_connection().await?;
         Ok(c.del(token).await?)
     }
