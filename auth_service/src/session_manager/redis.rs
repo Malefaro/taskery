@@ -84,9 +84,11 @@ impl super::SessionManager for Redis {
         &self,
         token: String,
         user_id: i32,
-    ) -> Result<i32, Box<dyn std::error::Error>> {
+    ) -> Result<(), Box<dyn std::error::Error>> {
         let mut c = self.client.get_async_connection().await?;
-        Ok(c.set(token, user_id).await?)
+        let _: () = c.set(token, user_id).await?;
+        Ok(())
+        // Ok(c.set(token, user_id).await?.map(|_: i32|()))
     }
 
     async fn delete_token(&self, token: String) -> Result<(), Box<dyn std::error::Error>> {
