@@ -1,9 +1,17 @@
-use async_graphql::{ComplexObject, Result as GQLResult, SimpleObject};
+use async_graphql::{
+    dataloader::{DataLoader, Loader},
+    ComplexObject, Context, Result as GQLResult, SimpleObject,
+};
 use diesel::{Identifiable, Insertable, Queryable};
 use serde::{Deserialize, Serialize};
 
+use crate::{
+    // data_loader::{Dataloader, UserID},
+    database::postgres::PostgresDB,
+};
+
 use super::{diesel_schema::*, Company};
-#[derive(SimpleObject, Identifiable, Queryable, Serialize, Deserialize, Debug)]
+#[derive(SimpleObject, Identifiable, Queryable, Serialize, Deserialize, Debug, Clone)]
 #[graphql(complex)]
 pub struct User {
     pub id: i32,
@@ -11,10 +19,13 @@ pub struct User {
     pub password: String,
     pub is_admin: bool,
 }
-
 #[ComplexObject]
 impl User {
-    async fn companies(&self) -> GQLResult<Company> {
+    async fn companies<'ctx>(&self, ctx: &Context<'ctx>) -> GQLResult<Vec<Company>> {
+        // let db = ctx.data_unchecked::<DataLoader<Dataloader<PostgresDB>>>();
+        // // let db:&Dataloader<PostgresDB> = Dataloader::from_ctx(ctx);
+        // let res = db.load_one(1 as UserID).await;
+        // let db = ctx.data_unchecked::<ABC>();
         unimplemented!()
     }
 }
@@ -25,14 +36,3 @@ pub struct NewUser {
     pub email: String,
     pub password: String,
 }
-
-// use crate::company::Company;
-// #[graphql_object(context=Context)]
-// impl User {
-//     pub async fn id(&self) -> i32 {
-//         self.id
-//     }
-//     pub async fn companies(&self, context: &Context) -> Vec<Company> {
-
-//     }
-// }

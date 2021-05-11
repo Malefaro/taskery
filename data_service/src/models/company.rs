@@ -7,7 +7,7 @@ use crate::models::User;
 
 use super::Project;
 
-#[derive(SimpleObject, Queryable, Identifiable, Serialize, Deserialize, Debug)]
+#[derive(SimpleObject, Queryable, Identifiable, Serialize, Deserialize, Debug, Clone)]
 #[table_name = "companies"]
 #[graphql(complex)]
 pub struct Company {

@@ -1,6 +1,6 @@
-use async_graphql::{Context, Object, Result as GQLResult};
+use async_graphql::{Context, Object, Result as GQLResult, dataloader::DataLoader};
 
-use crate::models::{Company, User};
+use crate::{database::postgres::PostgresDB, models::{Company, User}};
 pub struct QueryRoot;
 
 #[Object]
@@ -8,7 +8,10 @@ impl QueryRoot {
     async fn users<'ctx>(&self, ctx: &Context<'ctx>) -> GQLResult<Vec<User>> {
         unimplemented!()
     }
-    async fn user<'ctx>(&self, ctx: &Context<'ctx>, id: i32) -> GQLResult<User> {
+    async fn user<'ctx>(&self, ctx: &Context<'ctx>, id: i32) -> GQLResult<Option<User>> {
+        // let db = ctx.data_unchecked::<DataLoader<Dataloader<PostgresDB>>>();
+        // let res = db.load_one(id).await?;
+        // Ok(res)
         unimplemented!()
     }
     async fn companies<'ctx>(&self, ctx: &Context<'ctx>, user_id: i32) -> GQLResult<Vec<Company>> {

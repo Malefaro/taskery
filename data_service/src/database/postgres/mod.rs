@@ -14,7 +14,7 @@ pub struct PostgresDB {
 }
 
 impl PostgresDB {
-    fn new(url: &str) -> Self {
+    pub fn new(url: &str) -> Self {
         let manager = ConnectionManager::<PgConnection>::new(url);
         let pool = Pool::builder()
             .build(manager)
@@ -35,7 +35,7 @@ impl Clone for PostgresDB {
 }
 
 // Execute blocking code in thread pool
-async fn sync_to_async<F, I, E>(f: F) -> Result<I, BlockingError<E>>
+pub async fn sync_to_async<F, I, E>(f: F) -> Result<I, BlockingError<E>>
 where
     F: FnOnce() -> Result<I, E> + Send + 'static,
     I: Send + 'static,
@@ -47,19 +47,43 @@ where
 
 #[async_trait]
 impl Database for PostgresDB {
-    async fn get_user_by_id(&self, id: i32) -> super::DatabaseResult<crate::models::User> {
-        use crate::models::diesel_schema::users::dsl::users;
-        let c = self.pool.get()?;
-        let res = sync_to_async(move || users.find(id).first::<crate::models::User>(&c)).await?;
-        Ok(res)
+    // async fn get_user_by_id(&self, id: i32) -> super::DatabaseResult<crate::models::User> {
+    //     use crate::models::diesel_schema::users::dsl::users;
+    //     let c = self.pool.get()?;
+    //     let res = sync_to_async(move || users.find(id).first::<crate::models::User>(&c)).await?;
+    //     Ok(res)
+    // }
+
+    // async fn get_users_by_id_list(
+    //     &self,
+    //     id_list: &[i32],
+    // ) -> super::DatabaseResult<Vec<crate::models::User>> {
+        // let c = self.pool.get()?;
+        // use crate::models::diesel_schema::users::dsl::*;
+        // // need copy it due to sync_to_async (need static lifetime for closure)
+        // let id_list:Vec<i32> = id_list.iter().copied().collect();
+        // let res = sync_to_async(move || {
+        //     users
+        //         .filter(id.eq_any(id_list))
+        //         .load::<crate::models::User>(&c)
+        // })
+        // .await?;
+        // return Ok(res);
+    // }
+
+
+    async fn get_companies_by_id_list(
+        &self,
+        id_list: &[i32],
+    ) -> super::DatabaseResult<Vec<crate::models::Company>> {
+        todo!()
     }
 
-    async fn get_users_by_id_list(
-        &self,
-        id_list: Vec<i32>,
-    ) -> super::DatabaseResult<Vec<crate::models::User>> {
+    async fn get_users_by_id_list(&self, id_list: &[i32]) -> super::DatabaseResult<Vec<crate::models::User>> {
         let c = self.pool.get()?;
         use crate::models::diesel_schema::users::dsl::*;
+        // need copy it due to sync_to_async (need static lifetime for closure)
+        let id_list:Vec<i32> = id_list.iter().copied().collect();
         let res = sync_to_async(move || {
             users
                 .filter(id.eq_any(id_list))
@@ -67,17 +91,6 @@ impl Database for PostgresDB {
         })
         .await?;
         return Ok(res);
-    }
-
-    async fn get_company_by_id(&self, id: i32) -> super::DatabaseResult<crate::models::Company> {
-        todo!()
-    }
-
-    async fn get_companies_by_id_list(
-        &self,
-        id_list: Vec<i32>,
-    ) -> super::DatabaseResult<Vec<crate::models::Company>> {
-        todo!()
     }
 }
 
