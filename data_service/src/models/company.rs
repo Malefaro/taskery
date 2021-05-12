@@ -1,4 +1,4 @@
-use async_graphql::{ComplexObject, Result as GQLResult, SimpleObject};
+use async_graphql::{ComplexObject, InputObject, Result as GQLResult, SimpleObject};
 use diesel::{Associations, Queryable};
 use serde::{Deserialize, Serialize};
 
@@ -16,6 +16,12 @@ pub struct Company {
     // users: Vec<User>,
 }
 
+#[derive(Insertable, InputObject, Clone, Debug, Serialize, Deserialize)]
+#[table_name = "companies"]
+pub struct NewCompany {
+    pub name: String,
+}
+
 #[ComplexObject]
 impl Company {
     async fn projects(&self) -> GQLResult<Project> {
@@ -26,6 +32,7 @@ impl Company {
 #[derive(SimpleObject, Queryable, Identifiable, Associations, Serialize, Deserialize, Debug)]
 #[belongs_to(User)]
 #[belongs_to(Company)]
+#[table_name = "company_user_relations"]
 pub struct CompanyUserRelation {
     pub id: i32,
     pub user_id: i32,

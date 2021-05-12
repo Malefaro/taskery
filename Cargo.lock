@@ -937,6 +937,7 @@ dependencies = [
  "diesel",
  "juniper",
  "serde",
+ "serde_json",
 ]
 
 [[package]]

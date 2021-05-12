@@ -1,100 +1,80 @@
-use async_graphql::{Context, Object, Result as GQLResult, dataloader::DataLoader};
+use async_graphql::{
+    dataloader::DataLoader, Context, EmptySubscription, Object, Result as GQLResult, Schema,
+};
+use serde::Serialize;
 
-use crate::{database::postgres::PostgresDB, models::{Company, User}};
+use crate::{
+    data_loader::Dataloader,
+    database::postgres::PostgresDB,
+    models::{Company, NewCompany, NewUser, User},
+};
 pub struct QueryRoot;
 
 #[Object]
 impl QueryRoot {
-    async fn users<'ctx>(&self, ctx: &Context<'ctx>) -> GQLResult<Vec<User>> {
-        unimplemented!()
-    }
     async fn user<'ctx>(&self, ctx: &Context<'ctx>, id: i32) -> GQLResult<Option<User>> {
-        // let db = ctx.data_unchecked::<DataLoader<Dataloader<PostgresDB>>>();
-        // let res = db.load_one(id).await?;
-        // Ok(res)
-        unimplemented!()
-    }
-    async fn companies<'ctx>(&self, ctx: &Context<'ctx>, user_id: i32) -> GQLResult<Vec<Company>> {
-        unimplemented!()
-    }
-    async fn company<'ctx>(&self, ctx: &Context<'ctx>, company_id: i32) -> GQLResult<User> {
-        unimplemented!()
+        let db = ctx.data_unchecked::<Dataloader>();
+        let r = db.0.get_user_by_id(id).await?;
+        Ok(r)
     }
 }
-// use std::marker::PhantomData;
 
-// use juniper::{FieldResult, graphql_interface, graphql_object};
-// use crate::models::User;
+pub struct MutationRoot;
 
-// pub struct QueryRoot;
+#[Object]
+impl MutationRoot {
+    async fn create_user<'ctx>(&self, ctx: &Context<'ctx>, user: NewUser) -> GQLResult<User> {
+        let db = ctx.data_unchecked::<Dataloader>();
+        let r = db.0.create_user(user).await?;
+        Ok(r)
+    }
+    async fn create_company<'ctx>(
+        &self,
+        ctx: &Context<'ctx>,
+        user_id: i32,
+        company: NewCompany,
+    ) -> GQLResult<Company> {
+        let db = ctx.data_unchecked::<Dataloader>();
+        let r = db.0.create_company(user_id, company).await?;
+        Ok(r)
+    }
+}
 
-// // #[cfg(future="postgres")]
-// // pub struct Context{
-// //     pool: i32,
-// // }
-// // pub struct Context;
-// pub trait Database {
-//     fn get_obj(&self);
-// }
-// pub struct Context<DB: Database> {
-//     db: DB,
+#[actix_rt::test]
+async fn test() {
+    use async_graphql::{Request, Variables};
+    let schema = Schema::build(QueryRoot, MutationRoot, EmptySubscription)
+        .data(Dataloader(Box::pin(PostgresDB::new(
+            "postgres://localhost/taskery",
+        ))))
+        .finish();
+    // println!("{}", schema.sdl());
+    let r = Request::new(r#"query {user(id: 1) {email, companies{id,name}}}"#);
 
-// }
-// pub struct PSQL {
-//     pool: i32,
+    // let r = Request::new(
+    //     r#"mutation CreateUser($newUser: NewUser!) {
+    //         createUser(user: $newUser){id, email, password, isAdmin}
+    //     }"#,
+    // )
+    // .variables(Variables::from_json(
+    //     serde_json::from_str(&r#"{"newUser":{"email": "asd@m.r", "password": "asd"}}"#.to_string()).unwrap()
+    // ));
 
-// }
-// impl Database for PSQL {
-//     fn get_obj(&self) {
-
-//     }
-// }
-// pub struct Mongo {
-
-// }
-// impl Database for Mongo {
-//     fn get_obj(&self) {
-
-//     }
-// }
-
-// #[cfg(feature="postgres")]
-// type Ctx = Context<PSQL>;
-
-// #[cfg(feature="mongo")]
-// type Ctx = Context<Mongo>;
-
-// impl juniper::Context for Ctx{}
-
-// #[graphql_object(context=Ctx)]
-// impl QueryRoot {
-//     fn user(context: &Ctx, id: i32) -> FieldResult<User> {
-//         let c = context.db.get_obj();
-//         Ok(User{id:0, email: "asd".to_string(), password:"asd2".to_string()})
-//     }
-// }
-
-// struct MutationRoot;
-
-// #[test]
-// fn tst() {
-//     use juniper::{
-//         graphql_object, EmptyMutation, EmptySubscription, FieldResult,
-//         GraphQLEnum, Variables, graphql_value,
-//     };
-//     let ctx = Context{db:PSQL{pool:1}};
-//     type Schema = juniper::RootNode<'static, QueryRoot, EmptyMutation<Context<PSQL>>, EmptySubscription<Context<PSQL>>>;
-//     let schema = Schema::new(QueryRoot, EmptyMutation::new(), EmptySubscription::new());
-//     println!("{}", schema.as_schema_language());
-//     // Run the executor.
-//     let (res, _errors) = juniper::execute_sync(
-//         "query { user(id: 1){id, email, password} }",
-//         None,
-//         &Schema::new(QueryRoot, EmptyMutation::new(), EmptySubscription::new()),
-//         &Variables::new(),
-//         &ctx,
-//     ).unwrap();
-//     println!("{}", res);
-//     // Ensure the value matches.
-
-// }
+    // let r = Request::new(
+    //     r#"mutation CreateCompany($user_id: Int!, $newCompany: NewCompany!) {
+    //         createCompany(userId: $user_id, company: $newCompany){id, name}
+    //     }"#,
+    // )
+    // .variables(Variables::from_json(
+    //     serde_json::from_str(&r#"{"newCompany":{"name": "failed company"}, "user_id": 2}"#.to_string()).unwrap()
+    // ));
+    println!("{:?}", r);
+    let res = schema.execute(r).await.into_result();
+    // let tp = res.unwrap().data;
+    match res {
+        Ok(r) => println!("{}", r.data),
+        Err(err) => err.into_iter().for_each(|err| println!("{}", err)),
+    };
+    // println!("{:?}", res);
+    // println!("{}", schema.federation_sdl());
+}

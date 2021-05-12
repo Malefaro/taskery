@@ -1,14 +1,11 @@
 use async_graphql::{
     dataloader::{DataLoader, Loader},
-    ComplexObject, Context, Result as GQLResult, SimpleObject,
+    ComplexObject, Context, InputObject, Result as GQLResult, SimpleObject,
 };
 use diesel::{Identifiable, Insertable, Queryable};
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    // data_loader::{Dataloader, UserID},
-    database::postgres::PostgresDB,
-};
+use crate::{data_loader::Dataloader, database::postgres::PostgresDB};
 
 use super::{diesel_schema::*, Company};
 #[derive(SimpleObject, Identifiable, Queryable, Serialize, Deserialize, Debug, Clone)]
@@ -22,15 +19,23 @@ pub struct User {
 #[ComplexObject]
 impl User {
     async fn companies<'ctx>(&self, ctx: &Context<'ctx>) -> GQLResult<Vec<Company>> {
-        // let db = ctx.data_unchecked::<DataLoader<Dataloader<PostgresDB>>>();
-        // // let db:&Dataloader<PostgresDB> = Dataloader::from_ctx(ctx);
-        // let res = db.load_one(1 as UserID).await;
-        // let db = ctx.data_unchecked::<ABC>();
-        unimplemented!()
+        let db = ctx.data_unchecked::<Dataloader>();
+        let r = db.0.get_user_companies(self.id).await?;
+        Ok(r)
+    }
+    async fn company<'ctx>(
+        &self,
+        ctx: &Context<'ctx>,
+        company_id: i32,
+    ) -> GQLResult<Option<Company>> {
+        // TODO: maybe it should be private. So need check for access(user exists in this company)
+        let db = ctx.data_unchecked::<Dataloader>();
+        let r = db.0.get_company_by_id(company_id).await?;
+        Ok(r)
     }
 }
 
-#[derive(Insertable)]
+#[derive(Insertable, InputObject, Clone, Debug, Serialize, Deserialize)]
 #[table_name = "users"]
 pub struct NewUser {
     pub email: String,
