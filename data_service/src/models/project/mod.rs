@@ -2,14 +2,15 @@ pub mod board;
 pub mod pages;
 
 // use juniper::GraphQLObject;
-use async_graphql::{ComplexObject, Result as GQLResult, SimpleObject};
+use async_graphql::{ComplexObject, InputObject, Result as GQLResult, SimpleObject, Context};
 use diesel::{Associations, Identifiable, Queryable};
 use serde::{Deserialize, Serialize};
+use crate::data_loader::Dataloader;
 
 use super::diesel_schema::*;
 use super::Company;
 
-#[derive(SimpleObject, Associations, Identifiable, Queryable, Serialize, Deserialize, Debug)]
+#[derive(SimpleObject, Associations, Identifiable, Queryable, Serialize, Deserialize, Debug, Clone)]
 #[belongs_to(Company)]
 #[graphql(complex)]
 pub struct Project {
@@ -20,9 +21,22 @@ pub struct Project {
 
 #[ComplexObject]
 impl Project {
-    async fn boards(&self) -> GQLResult<Board> {
-        unimplemented!()
+    async fn boards<'ctx>(&self, ctx: &Context<'ctx>) -> GQLResult<Vec<Board>> {
+        let loader = ctx.data_unchecked::<Dataloader>();
+        let r = loader.project_boards_loader.load_one(self.id).await?.unwrap_or_else(|| vec![]);
+        Ok(r)
     }
+    async fn board<'ctx>(&self, ctx: &Context<'ctx>, board_id: i32) -> GQLResult<Option<Board>> {
+        let loader = ctx.data_unchecked::<Dataloader>();
+        let r = loader.board_loader.load_one(board_id).await?;
+        Ok(r)
+    }
+}
+#[derive(Insertable, InputObject, Clone, Debug, Serialize, Deserialize)]
+#[table_name = "projects"]
+pub struct NewProject {
+    pub name: String,
+    pub company_id: i32,
 }
 
 pub use board::Board;

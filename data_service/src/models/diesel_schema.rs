@@ -43,6 +43,7 @@ table! {
         id -> Int4,
         name -> Varchar,
         project_id -> Int4,
+        text -> Text,
     }
 }
 
@@ -94,7 +95,7 @@ table! {
         resolved -> Nullable<Bool>,
         column_id -> Int4,
         author_id -> Int4,
-        performer_id -> Int4,
+        performer_id -> Nullable<Int4>,
         created_at -> Timestamptz,
         updated_at -> Timestamptz,
     }

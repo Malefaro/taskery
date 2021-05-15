@@ -19,8 +19,8 @@ pub struct User {
 #[ComplexObject]
 impl User {
     async fn companies<'ctx>(&self, ctx: &Context<'ctx>) -> GQLResult<Vec<Company>> {
-        let db = ctx.data_unchecked::<Dataloader>();
-        let r = db.0.get_user_companies(self.id).await?;
+        let loader = ctx.data_unchecked::<Dataloader>();
+        let r = loader.user_companies_loader.load_one(self.id).await?.unwrap_or_else(|| vec![]);
         Ok(r)
     }
     async fn company<'ctx>(
@@ -29,8 +29,8 @@ impl User {
         company_id: i32,
     ) -> GQLResult<Option<Company>> {
         // TODO: maybe it should be private. So need check for access(user exists in this company)
-        let db = ctx.data_unchecked::<Dataloader>();
-        let r = db.0.get_company_by_id(company_id).await?;
+        let loader = ctx.data_unchecked::<Dataloader>();
+        let r = loader.company_loader.load_one(company_id).await?;
         Ok(r)
     }
 }

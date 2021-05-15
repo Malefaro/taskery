@@ -1,7 +1,10 @@
-use async_graphql::{ComplexObject, InputObject, Result as GQLResult, SimpleObject};
+use async_graphql::{
+    dataloader::DataLoader, ComplexObject, Context, InputObject, Result as GQLResult, SimpleObject,
+};
 use diesel::{Associations, Queryable};
 use serde::{Deserialize, Serialize};
 
+use crate::data_loader::Dataloader;
 use crate::models::diesel_schema::*;
 use crate::models::User;
 
@@ -24,8 +27,23 @@ pub struct NewCompany {
 
 #[ComplexObject]
 impl Company {
-    async fn projects(&self) -> GQLResult<Project> {
-        unimplemented!()
+    async fn projects<'ctx>(&self, ctx: &Context<'ctx>) -> GQLResult<Vec<Project>> {
+        let loader = ctx.data_unchecked::<Dataloader>();
+        let r = loader
+            .company_projects_loader
+            .load_one(self.id)
+            .await?
+            .unwrap_or_else(|| vec![]);
+        Ok(r)
+    }
+    async fn project<'ctx>(
+        &self,
+        ctx: &Context<'ctx>,
+        project_id: i32,
+    ) -> GQLResult<Option<Project>> {
+        let loader = ctx.data_unchecked::<Dataloader>();
+        let r = loader.project_loader.load_one(project_id).await?;
+        Ok(r)
     }
 }
 
