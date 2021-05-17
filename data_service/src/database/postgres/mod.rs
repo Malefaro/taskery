@@ -6,10 +6,7 @@ use diesel::r2d2::{ConnectionManager, Pool, PoolError, PooledConnection};
 use diesel::{pg::PgConnection, QueryDsl};
 use diesel::{prelude::*, query_dsl::InternalJoinDsl};
 
-use crate::{
-    database::Database,
-    models::{Company, CompanyUserRelation, NewCompany, NewUser, User},
-};
+use crate::{database::Database, models::{Board, Company, CompanyUserRelation, NewCompany, NewUser, Project, User, board::{BoardColumn, task::{Tag, Task, TaskComment}}, pages::Page}};
 
 use super::{DatabaseCreate, DatabaseModify, DatabaseRead, DatabaseResult};
 
@@ -52,92 +49,99 @@ where
     web::block(f).await
 }
 
-#[async_trait]
-impl DatabaseRead for PostgresDB {
-    async fn get_users_by_id_list(&self, id_list: &[i32]) -> DatabaseResult<Vec<User>> {
-        let c = self.pool.get()?;
-        use crate::models::diesel_schema::users::dsl::*;
+macro_rules! get_models_many {
+    ($self:ident, $id_list:ident, $dsl_name:ident, $model:ident) => {
+        let c = $self.pool.get()?;
+        use crate::models::diesel_schema::$dsl_name::dsl::*;
         // need copy it due to sync_to_async (need static lifetime for closure)
-        let id_list: Vec<i32> = id_list.iter().copied().collect();
-        let res = sync_to_async(move || users.filter(id.eq_any(id_list)).load::<User>(&c)).await?;
-        return Ok(res);
-    }
-
-    // TODO: create macros for this.
-    async fn get_companies_by_id_list(&self, id_list: &[i32]) -> DatabaseResult<Vec<Company>> {
-        let c = self.pool.get()?;
-        use crate::models::diesel_schema::companies::dsl::*;
-        // need copy it due to sync_to_async (need static lifetime for closure)
-        let id_list: Vec<i32> = id_list.iter().copied().collect();
-        let res =
-            sync_to_async(move || companies.filter(id.eq_any(id_list)).load::<Company>(&c)).await?;
-        return Ok(res);
-    }
-
-    async fn get_projects_by_id_list(&self, id_list: &[i32]) -> DatabaseResult<Vec<crate::models::Project>> {
-        todo!()
-    }
-
-    async fn get_boards_by_id_list(&self, id_list: &[i32]) -> DatabaseResult<Vec<crate::models::Board>> {
-        todo!()
-    }
-
-    async fn get_pages_by_id_list(&self, id_list: &[i32]) -> DatabaseResult<Vec<crate::models::pages::Page>> {
-        todo!()
-    }
-
-    async fn get_users_companies(&self, id_list: &[i32]) -> DatabaseResult<HashMap<i32, Vec<Company>>> {
-        let c = self.pool.get()?;
-        use crate::models::diesel_schema::companies as c;
-        use crate::models::diesel_schema::company_user_relations as cur;
-        let id_list: Vec<i32> = id_list.iter().copied().collect();
+        let id_list: Vec<i32> = $id_list.iter().copied().collect();
+        let res = sync_to_async(move || $dsl_name.filter(id.eq_any(id_list)).load::<$model>(&c)).await?;
+        return Ok(res)
+    };
+}
+macro_rules! get_related_models {
+    ($self:ident, $id_list:ident, $table:ident, $through_table:ident, $field:ident, $model:ident) => {
+        let c = $self.pool.get()?;
+        use crate::models::diesel_schema::$table as c;
+        use crate::models::diesel_schema::$through_table as through;
+        let id_list: Vec<i32> = $id_list.iter().copied().collect();
         let res = sync_to_async(move || {
-            cur::table
-                .inner_join(c::table.on(cur::company_id.eq(c::id)))
-                .select((cur::user_id, c::all_columns))
-                .filter(cur::user_id.eq_any(id_list))
-                .load::<(i32, Company)>(&c)
+            through::table
+                .inner_join(c::table)
+                .select((through::$field, c::all_columns))
+                .filter(through::$field.eq_any(id_list))
+                .load::<(i32, $model)>(&c)
         })
         .await?;
-        let mut m: HashMap<i32, Vec<Company>> = HashMap::with_capacity(res.len());
+        let mut m: HashMap<i32, Vec<$model>> = HashMap::with_capacity(res.len());
         res.into_iter().for_each(|(id, c)| {
             m.entry(id).and_modify(|e| e.push(c.clone())).or_insert(vec![c]);
         });
-        Ok(m)
+        return Ok(m)
+    };
+}
+#[async_trait]
+impl DatabaseRead for PostgresDB {
+    async fn get_users_by_id_list(&self, id_list: &[i32]) -> DatabaseResult<Vec<User>> {
+        use crate::models::diesel_schema::users::*;
+        get_models_many!(self, id_list, users, User);
     }
 
-    async fn get_companies_projects(&self, companies_ids: &[i32]) -> DatabaseResult<HashMap<i32, Vec<crate::models::Project>>> {
-        todo!()
+    async fn get_companies_by_id_list(&self, id_list: &[i32]) -> DatabaseResult<Vec<Company>> {
+        get_models_many!(self, id_list, companies, Company);
     }
 
-    async fn get_projects_boards(&self, projects_ids: &[i32]) -> DatabaseResult<HashMap<i32, Vec<crate::models::Board>>> {
-        todo!()
+    async fn get_projects_by_id_list(&self, id_list: &[i32]) -> DatabaseResult<Vec<Project>> {
+        get_models_many!(self, id_list, projects, Project);
     }
 
-    async fn get_projects_pages(&self, projects_ids: &[i32]) -> DatabaseResult<HashMap<i32, Vec<crate::models::pages::Page>>> {
-        todo!()
+    async fn get_boards_by_id_list(&self, id_list: &[i32]) -> DatabaseResult<Vec<Board>> {
+        get_models_many!(self, id_list, boards, Board);
     }
 
-    async fn get_boards_columns(&self, boards_ids: &[i32]) -> DatabaseResult<HashMap<i32, Vec<crate::models::board::BoardColumn>>> {
-        todo!()
+    async fn get_pages_by_id_list(&self, id_list: &[i32]) -> DatabaseResult<Vec<Page>> {
+        get_models_many!(self, id_list, pages, Page);
     }
 
-    async fn get_columns_tasks(&self, columns_ids: &[i32]) -> DatabaseResult<HashMap<i32, Vec<crate::models::board::task::Task>>> {
-        todo!()
+    async fn get_users_companies(&self, id_list: &[i32]) -> DatabaseResult<HashMap<i32, Vec<Company>>> {
+        get_related_models!(self, id_list, companies, company_user_relations, company_id, Company);
     }
 
-    async fn get_tasks_comments(&self, tasks_ids: &[i32]) -> DatabaseResult<HashMap<i32, Vec<crate::models::board::task::TaskComment>>> {
-        todo!()
+    async fn get_companies_projects(&self, companies_ids: &[i32]) -> DatabaseResult<HashMap<i32, Vec<Project>>> {
+        get_related_models!(self, companies_ids, projects, company_project_relations, company_id, Project);
+        // todo!()
     }
 
-    async fn get_tasks_tags(&self, tasks_ids: &[i32]) -> DatabaseResult<HashMap<i32, Vec<crate::models::board::task::Tag>>> {
-        todo!()
+    async fn get_projects_boards(&self, projects_ids: &[i32]) -> DatabaseResult<HashMap<i32, Vec<Board>>> {
+        get_related_models!(self, projects_ids, boards, project_board_relations, project_id, Board);
     }
 
-    async fn get_tasks_by_id_list(&self, id_list: &[i32]) -> DatabaseResult<Vec<crate::models::board::task::Task>> {
-        todo!()
+    async fn get_projects_pages(&self, projects_ids: &[i32]) -> DatabaseResult<HashMap<i32, Vec<Page>>> {
+        get_related_models!(self, projects_ids, pages, project_pages_relations, project_id, Page);
+    }
+
+    async fn get_boards_columns(&self, boards_ids: &[i32]) -> DatabaseResult<HashMap<i32, Vec<BoardColumn>>> {
+        get_related_models!(self, boards_ids, boards, board_column_relations, board_id, BoardColumn);
+    }
+
+    async fn get_columns_tasks(&self, columns_ids: &[i32]) -> DatabaseResult<HashMap<i32, Vec<Task>>> {
+        get_related_models!(self, columns_ids, tasks, column_task_relations, column_id, Task);
+    }
+
+    async fn get_tasks_comments(&self, tasks_ids: &[i32]) -> DatabaseResult<HashMap<i32, Vec<TaskComment>>> {
+        get_related_models!(self, tasks_ids, task_comments, task_comment_relations, task_id, TaskComment);
+    }
+
+    async fn get_tasks_tags(&self, tasks_ids: &[i32]) -> DatabaseResult<HashMap<i32, Vec<Tag>>> {
+        get_related_models!(self, tasks_ids, tags, task_tag_relations, task_id, Tag);
+    }
+
+    async fn get_tasks_by_id_list(&self, id_list: &[i32]) -> DatabaseResult<Vec<Task>> {
+        get_models_many!(self, id_list, tasks, Task);
     }
 }
+
+
 #[async_trait]
 impl DatabaseCreate for PostgresDB {
     async fn create_user(&self, user: NewUser) -> DatabaseResult<User> {
@@ -174,23 +178,23 @@ impl DatabaseCreate for PostgresDB {
         Ok(res)
     }
 
-    async fn create_project(&self, project: crate::models::NewProject) -> DatabaseResult<crate::models::Project> {
+    async fn create_project(&self, project: crate::models::NewProject) -> DatabaseResult<Project> {
         todo!()
     }
 
-    async fn create_board(&self, board: crate::models::board::NewBoard) -> DatabaseResult<crate::models::Board> {
+    async fn create_board(&self, board: crate::models::board::NewBoard) -> DatabaseResult<Board> {
         todo!()
     }
 
-    async fn create_column(&self, column: crate::models::board::column::NewBoardColumn) -> DatabaseResult<crate::models::board::BoardColumn> {
+    async fn create_column(&self, column: crate::models::board::column::NewBoardColumn) -> DatabaseResult<BoardColumn> {
         todo!()
     }
 
-    async fn create_task(&self, task: crate::models::board::task::NewTask) -> DatabaseResult<crate::models::board::task::Task> {
+    async fn create_task(&self, task: crate::models::board::task::NewTask) -> DatabaseResult<Task> {
         todo!()
     }
 
-    async fn create_tag(&self, tag: crate::models::board::task::NewTag) -> DatabaseResult<crate::models::board::task::Tag> {
+    async fn create_tag(&self, tag: crate::models::board::task::NewTag) -> DatabaseResult<Tag> {
         todo!()
     }
 }

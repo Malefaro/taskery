@@ -10,6 +10,6 @@ use super::Project;
 pub struct Page {
     pub id: i32,
     pub name: String,
-    pub text: String,
     pub project_id: i32,
+    pub text: String,
 }
