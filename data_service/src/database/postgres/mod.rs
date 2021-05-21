@@ -227,6 +227,23 @@ impl DatabaseRead for PostgresDB {
     async fn get_tasks_by_id_list(&self, id_list: &[i32]) -> DatabaseResult<Vec<Task>> {
         get_models_many!(self, id_list, tasks, Task);
     }
+
+    async fn get_user_by_email_password(
+        &self,
+        email: String,
+        password: String,
+    ) -> DatabaseResult<Option<User>> {
+        let c = self.pool.get()?;
+        use crate::models::diesel_schema::users;
+        let r = sync_to_async(move || {
+            users::table
+                .filter(users::email.eq(email).and(users::password.eq(password)))
+                .first::<User>(&c)
+                .optional()
+        })
+        .await?;
+        Ok(r)
+    }
 }
 
 macro_rules! create_related {

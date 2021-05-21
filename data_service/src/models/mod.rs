@@ -1,4 +1,4 @@
-pub mod auth_token;
+pub mod auth;
 pub mod company;
 pub mod experience;
 pub mod permissions;
@@ -10,7 +10,7 @@ pub mod user;
 // extern crate diesel;
 pub mod diesel_schema;
 
-pub use auth_token::*;
+pub use auth::*;
 pub use company::*;
 pub use experience::*;
 pub use permissions::*;

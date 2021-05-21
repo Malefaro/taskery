@@ -13,6 +13,7 @@ use super::{diesel_schema::*, Company};
 pub struct User {
     pub id: i32,
     pub email: String,
+    #[graphql(skip)]
     pub password: String,
     pub is_admin: bool,
 }

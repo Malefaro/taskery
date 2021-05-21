@@ -62,42 +62,42 @@ impl MutationRoot {
     }
 }
 
-#[actix_rt::test]
-async fn test() {
-    use crate::database::postgres::PostgresDB;
-    use async_graphql::{EmptySubscription, Schema};
-    use async_graphql::{Request, Variables};
-    let db = Box::pin(PostgresDB::new("postgres://localhost/taskery"));
-    let schema = Schema::build(QueryRoot, MutationRoot, EmptySubscription)
-        .data(Dataloader::new(db))
-        .finish();
-    // println!("{}", schema.sdl());
-    let r = Request::new(r#"query {user(id: 1) {email, companies{id,name}}}"#);
+// #[actix_rt::test]
+// async fn test() {
+//     use crate::database::postgres::PostgresDB;
+//     use async_graphql::{EmptySubscription, Schema};
+//     use async_graphql::{Request, Variables};
+//     let db = Box::pin(PostgresDB::new("postgres://localhost/taskery"));
+//     let schema = Schema::build(QueryRoot, MutationRoot, EmptySubscription)
+//         .data(Dataloader::new(db))
+//         .finish();
+//     // println!("{}", schema.sdl());
+//     let r = Request::new(r#"query {user(id: 1) {email, companies{id,name}}}"#);
 
-    // let r = Request::new(
-    //     r#"mutation CreateUser($newUser: NewUser!) {
-    //         createUser(user: $newUser){id, email, password, isAdmin}
-    //     }"#,
-    // )
-    // .variables(Variables::from_json(
-    //     serde_json::from_str(&r#"{"newUser":{"email": "asd@m.r", "password": "asd"}}"#.to_string()).unwrap()
-    // ));
+//     // let r = Request::new(
+//     //     r#"mutation CreateUser($newUser: NewUser!) {
+//     //         createUser(user: $newUser){id, email, password, isAdmin}
+//     //     }"#,
+//     // )
+//     // .variables(Variables::from_json(
+//     //     serde_json::from_str(&r#"{"newUser":{"email": "asd@m.r", "password": "asd"}}"#.to_string()).unwrap()
+//     // ));
 
-    // let r = Request::new(
-    //     r#"mutation CreateCompany($user_id: Int!, $newCompany: NewCompany!) {
-    //         createCompany(userId: $user_id, company: $newCompany){id, name}
-    //     }"#,
-    // )
-    // .variables(Variables::from_json(
-    //     serde_json::from_str(&r#"{"newCompany":{"name": "failed company"}, "user_id": 2}"#.to_string()).unwrap()
-    // ));
-    println!("{:?}", r);
-    let res = schema.execute(r).await.into_result();
-    // let tp = res.unwrap().data;
-    match res {
-        Ok(r) => println!("{}", r.data),
-        Err(err) => err.into_iter().for_each(|err| println!("{}", err)),
-    };
-    // println!("{:?}", res);
-    // println!("{}", schema.federation_sdl());
-}
+//     // let r = Request::new(
+//     //     r#"mutation CreateCompany($user_id: Int!, $newCompany: NewCompany!) {
+//     //         createCompany(userId: $user_id, company: $newCompany){id, name}
+//     //     }"#,
+//     // )
+//     // .variables(Variables::from_json(
+//     //     serde_json::from_str(&r#"{"newCompany":{"name": "failed company"}, "user_id": 2}"#.to_string()).unwrap()
+//     // ));
+//     println!("{:?}", r);
+//     let res = schema.execute(r).await.into_result();
+//     // let tp = res.unwrap().data;
+//     match res {
+//         Ok(r) => println!("{}", r.data),
+//         Err(err) => err.into_iter().for_each(|err| println!("{}", err)),
+//     };
+//     // println!("{:?}", res);
+//     // println!("{}", schema.federation_sdl());
+// }

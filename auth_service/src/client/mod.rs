@@ -4,11 +4,18 @@ use tonic::{transport::Channel, Request};
 
 use crate::proto::auth::auth_service_client::AuthServiceClient;
 use crate::proto::auth::{Token, UserId};
-pub struct Client<T> {
-    client: AuthServiceClient<T>,
+pub struct Client {
+    client: AuthServiceClient<Channel>,
+}
+impl Clone for Client {
+    fn clone(&self) -> Self {
+        Self {
+            client: self.client.clone(),
+        }
+    }
 }
 
-impl Client<Channel> {
+impl Client {
     pub async fn connect(url: String) -> Result<Self, Box<dyn Error>> {
         let client = AuthServiceClient::connect(url).await?;
         Ok(Self { client })

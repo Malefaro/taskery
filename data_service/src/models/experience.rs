@@ -1,11 +1,13 @@
+use async_graphql::SimpleObject;
 use diesel::{Associations, Identifiable, Queryable};
-use juniper::GraphQLObject;
 use serde::{Deserialize, Serialize};
 
 use super::diesel_schema::*;
 use super::{Company, User};
 
-#[derive(GraphQLObject, Queryable, Associations, Identifiable, Serialize, Deserialize, Debug)]
+#[derive(
+    SimpleObject, Queryable, Associations, Identifiable, Serialize, Deserialize, Debug, Clone,
+)]
 #[belongs_to(Company)]
 #[belongs_to(User)]
 pub struct Experience {

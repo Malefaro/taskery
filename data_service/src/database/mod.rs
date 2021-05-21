@@ -20,6 +20,11 @@ pub type DatabaseResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[async_trait]
 pub trait DatabaseRead {
+    async fn get_user_by_email_password(
+        &self,
+        email: String,
+        password: String,
+    ) -> DatabaseResult<Option<User>>;
     async fn get_users_by_id_list(&self, id_list: &[i32]) -> DatabaseResult<Vec<User>>;
     async fn get_companies_by_id_list(&self, id_list: &[i32]) -> DatabaseResult<Vec<Company>>;
     async fn get_projects_by_id_list(&self, id_list: &[i32]) -> DatabaseResult<Vec<Project>>;
@@ -80,6 +85,7 @@ pub trait DatabaseModify {
     ) -> DatabaseResult<Vec<TaskTagRelation>>;
 }
 
+// pub trait Database: DatabaseRead + DatabaseCreate + DatabaseModify{}
 pub trait Database: DatabaseRead + DatabaseCreate + DatabaseModify + DatabaseClone {}
 
 // Magic trick to make trait object clonable in our case (Pin<Box<...>>)
