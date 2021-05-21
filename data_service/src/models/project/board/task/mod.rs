@@ -4,9 +4,11 @@ pub mod history;
 pub use comment::*;
 pub use history::*;
 
-use async_graphql::{ComplexObject, InputObject, Result as GQLResult, SimpleObject, Context, dataloader::DataLoader};
+use async_graphql::{
+    dataloader::DataLoader, ComplexObject, Context, InputObject, Result as GQLResult, SimpleObject,
+};
 use chrono::NaiveDateTime;
-use diesel::{Associations, Identifiable, Queryable, AsChangeset};
+use diesel::{AsChangeset, Associations, Identifiable, Queryable};
 use serde::{Deserialize, Serialize};
 
 use super::super::super::diesel_schema::*;
@@ -15,12 +17,9 @@ use super::Board;
 use super::BoardColumn;
 use crate::data_loader::Dataloader;
 
-// pub enum TaskStatus {
-//     Done,
-//     InProgress,
-//     Pending,
-// }
-#[derive(SimpleObject, Associations, Identifiable, Queryable, Serialize, Deserialize, Debug, Clone)]
+#[derive(
+    SimpleObject, Associations, Identifiable, Queryable, Serialize, Deserialize, Debug, Clone,
+)]
 #[graphql(complex)]
 #[belongs_to(BoardColumn, foreign_key = "column_id")]
 #[belongs_to(User, foreign_key = "author_id")]
@@ -28,7 +27,6 @@ pub struct Task {
     pub id: i32,
     pub name: String,
     pub text: String,
-    // pub status: TaskStatus,
     pub resolved: bool,
     pub column_id: i32,
     pub author_id: i32,
@@ -59,7 +57,9 @@ impl Task {
     }
 }
 
-#[derive(SimpleObject, Associations, Identifiable, Queryable, Serialize, Deserialize, Debug, Clone)]
+#[derive(
+    SimpleObject, Associations, Identifiable, Queryable, Serialize, Deserialize, Debug, Clone,
+)]
 #[belongs_to(User, foreign_key = "author_id")]
 #[belongs_to(Board)]
 pub struct Tag {
@@ -73,7 +73,9 @@ pub struct Tag {
     pub updated_at: NaiveDateTime,
 }
 
-#[derive(SimpleObject, Associations, Identifiable, Queryable, Serialize, Deserialize, Debug, Clone)]
+#[derive(
+    SimpleObject, Associations, Identifiable, Queryable, Serialize, Deserialize, Debug, Clone,
+)]
 #[belongs_to(Tag)]
 #[belongs_to(Task)]
 pub struct TaskTagRelation {
@@ -90,7 +92,6 @@ pub struct NewTask {
     pub text: String,
     pub author_id: i32,
 }
-
 
 #[derive(Insertable, InputObject, Clone, Debug, Serialize, Deserialize)]
 #[table_name = "tags"]

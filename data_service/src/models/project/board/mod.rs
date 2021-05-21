@@ -1,10 +1,10 @@
 pub mod column;
 pub mod task;
 
+use crate::data_loader::Dataloader;
 use async_graphql::{ComplexObject, Context, InputObject, Result as GQLResult, SimpleObject};
 use diesel::{Associations, Identifiable, Queryable};
 use serde::{Deserialize, Serialize};
-use crate::data_loader::Dataloader;
 
 use super::super::diesel_schema::*;
 use super::Project;
@@ -24,7 +24,11 @@ pub struct Board {
 impl Board {
     async fn columns<'ctx>(&self, ctx: &Context<'ctx>) -> GQLResult<Vec<BoardColumn>> {
         let loader = ctx.data_unchecked::<Dataloader>();
-        let r = loader.board_columns_loader.load_one(self.id).await?.unwrap_or_else(|| vec![]);
+        let r = loader
+            .board_columns_loader
+            .load_one(self.id)
+            .await?
+            .unwrap_or_else(|| vec![]);
         Ok(r)
     }
 }

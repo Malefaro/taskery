@@ -1,17 +1,9 @@
-pub mod companies;
 pub mod macros;
 pub mod users;
-use actix_web::web::Data;
-use async_graphql::{dataloader::{Loader, DataLoader}, Context, FieldError};
-use std::{any::Any, collections::HashMap, error::Error, pin::Pin};
+use async_graphql::dataloader::DataLoader;
+use std::pin::Pin;
 
-use crate::{database::Database, loader, models::User};
-use crate::{
-    database::{postgres::PostgresDB, DatabaseRead},
-    models::Company,
-};
-
-// pub struct Dataloader(pub Pin<Box<dyn Database + Send + Sync>>);
+use crate::database::Database;
 
 pub mod loaders {
     use crate::{loader, loader_related};
@@ -49,15 +41,13 @@ use crate::create_dataloader;
 use loaders::*;
 
 create_dataloader!(
-    Dataloader, 
-
-    (user_loader, UserLoader), 
+    Dataloader,
+    (user_loader, UserLoader),
     (company_loader, CompanyLoader),
     (project_loader, ProjectLoader),
     (board_loader, BoardLoader),
     (page_loader, PageLoader),
     (task_loader, TaskLoader),
-
     (user_companies_loader, UserCompaniesLoader),
     (company_projects_loader, CompanyProjectsLoader),
     (project_boards_loader, ProjectBoardsLoader),
@@ -67,73 +57,3 @@ create_dataloader!(
     (task_comments_loader, TaskCommentsLoader),
     (task_tags_loader, TaskTagsLoader)
 );
-
-
-// #[derive(Hash, PartialEq, Eq, Clone, Debug)]
-// pub struct UserID(i32);
-
-// #[async_trait::async_trait]
-// impl Loader<UserID> for Dataloader {
-//     type Value = User;
-
-//     type Error = FieldError;
-
-//     async fn load(&self, keys: &[UserID]) -> Result<HashMap<UserID, Self::Value>, Self::Error> {
-//         let res = self
-//             .0
-//             // .inner
-//             .get_users_by_id_list(&keys.iter().cloned().map(|i| i.0).collect::<Vec<i32>>())
-//             .await?;
-//         let m: HashMap<UserID, Self::Value> = res
-//             .into_iter()
-//             .map(|model| (UserID(model.id), model))
-//             .collect();
-//         Ok(m)
-//         // todo!()
-//     }
-// }
-
-// #[derive(Hash, PartialEq, Eq, Clone, Debug)]
-// pub struct CompanyID(i32);
-
-// #[async_trait::async_trait]
-// impl Loader<CompanyID> for Dataloader {
-//     type Value = Company;
-
-//     type Error = FieldError;
-
-//     async fn load(
-//         &self,
-//         keys: &[CompanyID],
-//     ) -> Result<HashMap<CompanyID, Self::Value>, Self::Error> {
-//         let res = self
-//             .0
-//             .get_companies_by_id_list(&keys.iter().cloned().map(|i| i.0).collect::<Vec<i32>>())
-//             .await?;
-//         let m: HashMap<CompanyID, Self::Value> = res
-//             .into_iter()
-//             .map(|model| (CompanyID(model.id), model))
-//             .collect();
-//         Ok(m)
-//     }
-// }
-
-// #[test]
-// fn test() {
-//     trait T {}
-//     struct A;
-//     struct B;
-//     impl T for A {}
-//     impl T for B {}
-//     use std::any::{Any, TypeId};
-//     fn get_id<D: Any + Send + Sync>(v: D) -> TypeId {
-//         TypeId::of::<D>()
-//     }
-//     let t1 = Box::pin(A {});
-//     let t2 = Box::pin(B {});
-//     assert_eq!(get_id(t1), get_id(t2));
-//     // pub struct Dataloader(Pin<Box<dyn Database + Send + Sync>>);
-//     let db1 = Dataloader(Box::pin(PostgresDB::new("")));
-//     // let db2=Dataloader(Box::pin(MongoDB{}));
-//     // assert_eq!(get_id(db1), get_id(db2));
-// }

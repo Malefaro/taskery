@@ -7,7 +7,7 @@ macro_rules! loader {
         // use crate::models::*;
         // use crate::database::Database;
 
-        pub struct $name(pub Pin<Box<dyn Database+Send+Sync>>);
+        pub struct $name(pub Pin<Box<dyn Database + Send + Sync>>);
 
         #[async_trait::async_trait]
         impl Loader<i32> for $name {
@@ -16,14 +16,9 @@ macro_rules! loader {
             type Error = FieldError;
 
             async fn load(&self, keys: &[i32]) -> Result<HashMap<i32, Self::Value>, Self::Error> {
-                let res = self
-                    .0
-                    .$method(keys)
-                    .await?;
-                let m: HashMap<i32, Self::Value> = res
-                    .into_iter()
-                    .map(|model| (model.id, model))
-                    .collect();
+                let res = self.0.$method(keys).await?;
+                let m: HashMap<i32, Self::Value> =
+                    res.into_iter().map(|model| (model.id, model)).collect();
                 Ok(m)
             }
         }
@@ -33,7 +28,7 @@ macro_rules! loader {
 #[macro_export]
 macro_rules! loader_related {
     ($name:ident, $model: ident, $method: ident) => {
-        pub struct $name(pub Pin<Box<dyn Database+Send+Sync>>);
+        pub struct $name(pub Pin<Box<dyn Database + Send + Sync>>);
 
         #[async_trait::async_trait]
         impl Loader<i32> for $name {
@@ -42,16 +37,12 @@ macro_rules! loader_related {
             type Error = FieldError;
 
             async fn load(&self, keys: &[i32]) -> Result<HashMap<i32, Self::Value>, Self::Error> {
-                let res = self
-                    .0
-                    .$method(keys)
-                    .await?;
+                let res = self.0.$method(keys).await?;
                 Ok(res)
             }
         }
     };
 }
-
 
 #[macro_export]
 macro_rules! create_dataloader {
@@ -68,7 +59,7 @@ macro_rules! create_dataloader {
                     $(
                         $field_name: DataLoader::new($loader(db.clone())),
                     )+
-                    db, 
+                    db,
                 }
             }
         }

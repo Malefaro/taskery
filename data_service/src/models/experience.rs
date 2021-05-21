@@ -2,9 +2,9 @@ use diesel::{Associations, Identifiable, Queryable};
 use juniper::GraphQLObject;
 use serde::{Deserialize, Serialize};
 
-// use crate::models::diesel_schema::*;
 use super::diesel_schema::*;
 use super::{Company, User};
+
 #[derive(GraphQLObject, Queryable, Associations, Identifiable, Serialize, Deserialize, Debug)]
 #[belongs_to(Company)]
 #[belongs_to(User)]

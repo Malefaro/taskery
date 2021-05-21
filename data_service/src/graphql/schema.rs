@@ -1,12 +1,8 @@
-use async_graphql::{
-    dataloader::DataLoader, Context, EmptySubscription, Object, Result as GQLResult, Schema,
-};
-use serde::Serialize;
+use async_graphql::{Context, Object, Result as GQLResult};
 
 use crate::{
     data_loader::Dataloader,
-    database::postgres::PostgresDB,
-    models::{Company, NewCompany, NewUser, User, Project, Board, pages::Page},
+    models::{pages::Page, Board, Company, NewCompany, NewUser, Project, User},
 };
 pub struct QueryRoot;
 
@@ -17,11 +13,19 @@ impl QueryRoot {
         let r = loader.user_loader.load_one(id).await?;
         Ok(r)
     }
-    async fn companies<'ctx>(&self, ctx: &Context<'ctx>, user_id: Option<i32> /* this field can be accessed though request(from ctx.data)*/) -> GQLResult<Vec<Company>> {
+    async fn companies<'ctx>(
+        &self,
+        ctx: &Context<'ctx>,
+        user_id: Option<i32>, /* this field can be accessed though request(from ctx.data)*/
+    ) -> GQLResult<Vec<Company>> {
         // check user_id. if None -> check ctx.data::<Auth>() -> if no error
         todo!()
     }
-    async fn projects<'ctx>(&self, ctx: &Context<'ctx>, company_id: i32) -> GQLResult<Vec<Project>> {
+    async fn projects<'ctx>(
+        &self,
+        ctx: &Context<'ctx>,
+        company_id: i32,
+    ) -> GQLResult<Vec<Project>> {
         todo!()
     }
     async fn boards<'ctx>(&self, ctx: &Context<'ctx>, project_id: i32) -> GQLResult<Vec<Board>> {
@@ -60,10 +64,10 @@ impl MutationRoot {
 
 #[actix_rt::test]
 async fn test() {
+    use crate::database::postgres::PostgresDB;
+    use async_graphql::{EmptySubscription, Schema};
     use async_graphql::{Request, Variables};
-    let db = Box::pin(PostgresDB::new(
-            "postgres://localhost/taskery",
-        ));
+    let db = Box::pin(PostgresDB::new("postgres://localhost/taskery"));
     let schema = Schema::build(QueryRoot, MutationRoot, EmptySubscription)
         .data(Dataloader::new(db))
         .finish();

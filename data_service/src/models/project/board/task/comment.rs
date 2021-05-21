@@ -8,7 +8,9 @@ use super::super::super::super::diesel_schema::*;
 use super::super::super::super::User;
 use super::Task;
 
-#[derive(SimpleObject, Associations, Identifiable, Queryable, Serialize, Deserialize, Debug, Clone)]
+#[derive(
+    SimpleObject, Associations, Identifiable, Queryable, Serialize, Deserialize, Debug, Clone,
+)]
 #[belongs_to(Task, foreign_key = "task_id")]
 #[belongs_to(User, foreign_key = "author_id")]
 pub struct TaskComment {

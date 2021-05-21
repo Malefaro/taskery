@@ -3,12 +3,20 @@ pub mod postgres;
 
 use std::{collections::HashMap, pin::Pin};
 
-use crate::models::{Board, NewCompany, NewProject, NewUser, Project, board::{BoardColumn, NewBoard, column::NewBoardColumn, task::{NewTag, NewTask, Tag, Task, TaskComment, TaskForm}}, pages::Page};
+use crate::models::{
+    board::{
+        column::NewBoardColumn,
+        task::{NewTag, NewTask, Tag, Task, TaskComment, TaskForm, TaskTagRelation},
+        BoardColumn, NewBoard,
+    },
+    pages::Page,
+    Board, NewCompany, NewProject, NewUser, Project,
+};
 
 use super::models::{Company, User};
 use async_trait::async_trait;
 
-type DatabaseResult<T> = Result<T, Box<dyn std::error::Error>>;
+pub type DatabaseResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[async_trait]
 pub trait DatabaseRead {
@@ -20,13 +28,34 @@ pub trait DatabaseRead {
     async fn get_tasks_by_id_list(&self, id_list: &[i32]) -> DatabaseResult<Vec<Task>>;
 
     // related
-    async fn get_users_companies(&self, users_ids: &[i32]) -> DatabaseResult<HashMap<i32, Vec<Company>>>;
-    async fn get_companies_projects(&self, companies_ids: &[i32]) -> DatabaseResult<HashMap<i32, Vec<Project>>>;
-    async fn get_projects_boards(&self, projects_ids: &[i32]) -> DatabaseResult<HashMap<i32, Vec<Board>>>;
-    async fn get_projects_pages(&self, projects_ids: &[i32]) -> DatabaseResult<HashMap<i32, Vec<Page>>>;
-    async fn get_boards_columns(&self, boards_ids: &[i32]) -> DatabaseResult<HashMap<i32, Vec<BoardColumn>>>;
-    async fn get_columns_tasks(&self, columns_ids: &[i32]) -> DatabaseResult<HashMap<i32, Vec<Task>>>;
-    async fn get_tasks_comments(&self, tasks_ids: &[i32]) -> DatabaseResult<HashMap<i32, Vec<TaskComment>>>;
+    async fn get_users_companies(
+        &self,
+        users_ids: &[i32],
+    ) -> DatabaseResult<HashMap<i32, Vec<Company>>>;
+    async fn get_companies_projects(
+        &self,
+        companies_ids: &[i32],
+    ) -> DatabaseResult<HashMap<i32, Vec<Project>>>;
+    async fn get_projects_boards(
+        &self,
+        projects_ids: &[i32],
+    ) -> DatabaseResult<HashMap<i32, Vec<Board>>>;
+    async fn get_projects_pages(
+        &self,
+        projects_ids: &[i32],
+    ) -> DatabaseResult<HashMap<i32, Vec<Page>>>;
+    async fn get_boards_columns(
+        &self,
+        boards_ids: &[i32],
+    ) -> DatabaseResult<HashMap<i32, Vec<BoardColumn>>>;
+    async fn get_columns_tasks(
+        &self,
+        columns_ids: &[i32],
+    ) -> DatabaseResult<HashMap<i32, Vec<Task>>>;
+    async fn get_tasks_comments(
+        &self,
+        tasks_ids: &[i32],
+    ) -> DatabaseResult<HashMap<i32, Vec<TaskComment>>>;
     async fn get_tasks_tags(&self, tasks_ids: &[i32]) -> DatabaseResult<HashMap<i32, Vec<Tag>>>;
 }
 
@@ -43,8 +72,12 @@ pub trait DatabaseCreate {
 
 #[async_trait]
 pub trait DatabaseModify {
-    async fn modify_task(&self, task: TaskForm) -> DatabaseResult<User>;
-    async fn set_tags_for_task(&self, task_id: i32, tags_ids: Vec<i32>) -> DatabaseResult<User>;
+    async fn modify_task(&self, id: i32, task: TaskForm) -> DatabaseResult<Task>;
+    async fn set_tags_for_task(
+        &self,
+        task_id: i32,
+        tags_ids: Vec<i32>,
+    ) -> DatabaseResult<Vec<TaskTagRelation>>;
 }
 
 pub trait Database: DatabaseRead + DatabaseCreate + DatabaseModify + DatabaseClone {}
@@ -56,15 +89,17 @@ pub trait DatabaseClone {
     fn clone_pin_box(&self) -> Pin<Box<dyn Database + Send + Sync>>;
 }
 
-impl <T: Send+Sync> DatabaseClone for T where T: 'static + Database + Clone {
+impl<T: Send + Sync> DatabaseClone for T
+where
+    T: 'static + Database + Clone,
+{
     fn clone_pin_box(&self) -> Pin<Box<dyn Database + Send + Sync>> {
         Box::pin(self.clone())
     }
 }
 
 impl Clone for Pin<Box<dyn Database + Send + Sync>> {
-    fn clone(&self) -> Pin<Box<dyn Database+Send+Sync>> {
+    fn clone(&self) -> Pin<Box<dyn Database + Send + Sync>> {
         self.clone_pin_box()
     }
 }
-

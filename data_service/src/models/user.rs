@@ -20,7 +20,11 @@ pub struct User {
 impl User {
     async fn companies<'ctx>(&self, ctx: &Context<'ctx>) -> GQLResult<Vec<Company>> {
         let loader = ctx.data_unchecked::<Dataloader>();
-        let r = loader.user_companies_loader.load_one(self.id).await?.unwrap_or_else(|| vec![]);
+        let r = loader
+            .user_companies_loader
+            .load_one(self.id)
+            .await?
+            .unwrap_or_else(|| vec![]);
         Ok(r)
     }
     async fn company<'ctx>(
