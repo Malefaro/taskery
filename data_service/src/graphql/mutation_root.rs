@@ -6,11 +6,10 @@ use crate::{
             task::{NewTag, NewTask, Tag, Task, TaskForm},
             BoardColumn, NewBoard,
         },
-        pages::Page,
-        Auth, Board, Company, NewAuth, NewCompany, NewProject, NewUser, Project, User,
+        Auth, AuthGuard, Board, Company, NewAuth, NewCompany, NewProject, NewUser, Project, User,
     },
 };
-use async_graphql::{Context, Error, Object, Result as GQLResult};
+use async_graphql::{guard::Guard, Context, Error, Object, Result as GQLResult};
 use auth_service::client::Client;
 pub struct MutationRoot;
 
@@ -38,6 +37,8 @@ impl MutationRoot {
         let r = loader.db.create_user(user).await?;
         Ok(r)
     }
+
+    #[graphql(guard(AuthGuard(is_auth = "true")))]
     async fn create_company<'ctx>(
         &self,
         ctx: &Context<'ctx>,
@@ -48,6 +49,8 @@ impl MutationRoot {
         let r = loader.db.create_company(user_id, company).await?;
         Ok(r)
     }
+
+    #[graphql(guard(AuthGuard(is_auth = "true")))]
     async fn create_project<'ctx>(
         &self,
         ctx: &Context<'ctx>,
@@ -57,11 +60,15 @@ impl MutationRoot {
         let r = loader.db.create_project(project).await?;
         Ok(r)
     }
+
+    #[graphql(guard(AuthGuard(is_auth = "true")))]
     async fn create_board<'ctx>(&self, ctx: &Context<'ctx>, board: NewBoard) -> GQLResult<Board> {
         let loader = ctx.data_unchecked::<Dataloader>();
         let r = loader.db.create_board(board).await?;
         Ok(r)
     }
+
+    #[graphql(guard(AuthGuard(is_auth = "true")))]
     async fn create_board_column<'ctx>(
         &self,
         ctx: &Context<'ctx>,
@@ -71,16 +78,22 @@ impl MutationRoot {
         let r = loader.db.create_column(column).await?;
         Ok(r)
     }
+
+    #[graphql(guard(AuthGuard(is_auth = "true")))]
     async fn create_task<'ctx>(&self, ctx: &Context<'ctx>, task: NewTask) -> GQLResult<Task> {
         let loader = ctx.data_unchecked::<Dataloader>();
         let r = loader.db.create_task(task).await?;
         Ok(r)
     }
+
+    #[graphql(guard(AuthGuard(is_auth = "true")))]
     async fn create_tag<'ctx>(&self, ctx: &Context<'ctx>, tag: NewTag) -> GQLResult<Tag> {
         let loader = ctx.data_unchecked::<Dataloader>();
         let r = loader.db.create_tag(tag).await?;
         Ok(r)
     }
+
+    #[graphql(guard(AuthGuard(is_auth = "true")))]
     async fn modify_task<'ctx>(
         &self,
         ctx: &Context<'ctx>,

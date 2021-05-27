@@ -1,4 +1,6 @@
-use async_graphql::{ComplexObject, Context, InputObject, Result as GQLResult, SimpleObject};
+use async_graphql::{
+    guard::Guard, ComplexObject, Context, InputObject, Result as GQLResult, SimpleObject,
+};
 use serde::{Deserialize, Serialize};
 
 use super::User;
@@ -38,5 +40,21 @@ impl Auth {
         let loader = ctx.data_unchecked::<Dataloader>();
         let r = loader.user_loader.load_one(self.user_id).await?;
         Ok(r)
+    }
+}
+
+pub struct AuthGuard {
+    pub is_auth: bool,
+}
+
+#[async_trait::async_trait]
+impl Guard for AuthGuard {
+    async fn check(&self, ctx: &Context<'_>) -> GQLResult<()> {
+        // if ctx.data_opt::<Auth>().is_some() {
+        //     Ok(())
+        // } else {
+        //     Err("Forbidden".into())
+        // }
+        ctx.data_opt::<Auth>().map(|_| ()).ok_or("Forbidden".into())
     }
 }
