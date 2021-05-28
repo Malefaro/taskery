@@ -998,24 +998,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "data_service"
-version = "0.1.0"
-dependencies = [
- "actix-rt 2.2.0",
- "actix-web",
- "async-graphql",
- "async-graphql-actix-web",
- "async-trait",
- "auth_service",
- "chrono",
- "dataloader",
- "diesel",
- "serde",
- "serde_json",
- "tokio 1.5.0",
-]
-
-[[package]]
 name = "dataloader"
 version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1465,6 +1447,24 @@ dependencies = [
  "graphql_client_codegen",
  "proc-macro2",
  "syn",
+]
+
+[[package]]
+name = "graphql_server"
+version = "0.1.0"
+dependencies = [
+ "actix-rt 2.2.0",
+ "actix-web",
+ "async-graphql",
+ "async-graphql-actix-web",
+ "async-trait",
+ "auth_service",
+ "chrono",
+ "dataloader",
+ "diesel",
+ "serde",
+ "serde_json",
+ "tokio 1.5.0",
 ]
 
 [[package]]
@@ -2402,6 +2402,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "rest_server"
+version = "0.1.0"
+dependencies = [
+ "graphql_client",
+]
+
+[[package]]
 name = "rustc-demangle"
 version = "0.1.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2493,13 +2500,6 @@ dependencies = [
  "itoa",
  "ryu",
  "serde",
-]
-
-[[package]]
-name = "server"
-version = "0.1.0"
-dependencies = [
- "graphql_client",
 ]
 
 [[package]]

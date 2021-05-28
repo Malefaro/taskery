@@ -1,7 +1,7 @@
 [workspace]
 
 members = [
-    "data_service",
-    "server",
+    "graphql_server",
+    "rest_server",
     "auth_service",
 ]

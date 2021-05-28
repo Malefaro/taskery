@@ -21,9 +21,9 @@
 async fn test() {
     use async_graphql::{EmptySubscription, Schema};
     use async_graphql::{Request, Variables};
-    use data_service::data_loader::Dataloader;
-    use data_service::database::postgres::PostgresDB;
-    use data_service::graphql::{mutation_root::MutationRoot, query_root::QueryRoot};
+    use graphql_server::data_loader::Dataloader;
+    use graphql_server::database::postgres::PostgresDB;
+    use graphql_server::graphql::{mutation_root::MutationRoot, query_root::QueryRoot};
     let db = Box::pin(PostgresDB::new("postgres://localhost/taskery"));
     let schema = Schema::build(QueryRoot, MutationRoot, EmptySubscription)
         .data(Dataloader::new(db))

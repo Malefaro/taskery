@@ -1,5 +1,5 @@
 use auth_service::client::Client;
-use data_service::{database::postgres::PostgresDB, server::Server};
+use graphql_server::{database::postgres::PostgresDB, server::Server};
 
 const AUTH_SERVICE_URL: &'static str = "AUTH_SERVICE_URL";
 const POSTGRES_URL: &'static str = "POSTGRES_URL";
