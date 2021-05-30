@@ -3,11 +3,11 @@ use std::collections::HashMap;
 use actix_web::error::BlockingError;
 use async_trait::async_trait;
 use diesel::{pg::PgConnection, QueryDsl};
-use diesel::{prelude::*, query_dsl::InternalJoinDsl};
+use diesel::prelude::*;
 use diesel::{
     query_builder::InsertStatement,
-    query_dsl::{methods::ExecuteDsl, LoadQuery},
-    r2d2::{ConnectionManager, Pool, PoolError, PooledConnection},
+    query_dsl::LoadQuery,
+    r2d2::{ConnectionManager, Pool, PooledConnection},
 };
 
 use crate::{

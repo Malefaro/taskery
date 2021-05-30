@@ -1,7 +1,7 @@
 // pub mod mongo;
 pub mod postgres;
 
-use std::{collections::HashMap, pin::Pin};
+use std::collections::HashMap;
 
 use crate::models::{
     board::{
@@ -92,20 +92,20 @@ pub trait Database: DatabaseRead + DatabaseCreate + DatabaseModify + DatabaseClo
 // I have no idea why its works ( I mean how compiler resolve impl DatabaseClone for Database + Clone where Database require DatabaseClone)
 // https://stackoverflow.com/questions/30353462/how-to-clone-a-struct-storing-a-boxed-trait-object
 pub trait DatabaseClone {
-    fn clone_pin_box(&self) -> Pin<Box<dyn Database + Send + Sync>>;
+    fn clone_box(&self) -> Box<dyn Database + Send + Sync>;
 }
 
 impl<T: Send + Sync> DatabaseClone for T
 where
     T: 'static + Database + Clone,
 {
-    fn clone_pin_box(&self) -> Pin<Box<dyn Database + Send + Sync>> {
-        Box::pin(self.clone())
+    fn clone_box(&self) -> Box<dyn Database + Send + Sync> {
+        Box::new(self.clone())
     }
 }
 
-impl Clone for Pin<Box<dyn Database + Send + Sync>> {
-    fn clone(&self) -> Pin<Box<dyn Database + Send + Sync>> {
-        self.clone_pin_box()
+impl Clone for Box<dyn Database + Send + Sync> {
+    fn clone(&self) -> Box<dyn Database + Send + Sync> {
+        self.clone_box()
     }
 }

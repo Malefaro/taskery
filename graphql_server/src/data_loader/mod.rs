@@ -1,7 +1,5 @@
 pub mod macros;
-pub mod users;
 use async_graphql::dataloader::DataLoader;
-use std::pin::Pin;
 
 use crate::database::Database;
 

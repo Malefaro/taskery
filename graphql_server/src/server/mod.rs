@@ -13,7 +13,7 @@ use crate::{
     models::Auth,
 };
 pub struct Server {
-    db: Pin<Box<dyn Database + Send + Sync + 'static>>,
+    db: Box<dyn Database + Send + Sync + 'static>,
     auth_client: Client,
     port: i32,
 }
@@ -64,7 +64,7 @@ async fn index_playground() -> Result<HttpResponse> {
 impl Server {
     pub fn new(db: impl Database + 'static + Send + Sync, auth_client: Client, port: i32) -> Self {
         Self {
-            db: Box::pin(db),
+            db: Box::new(db),
             auth_client,
             port,
         }

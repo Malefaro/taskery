@@ -3,11 +3,15 @@ mod server;
 mod session_manager;
 
 use session_manager::redis;
+
+const REDIS_URL: &'static str = "REDIS_URL";
+const PORT: &'static str = "AUTH_SERVICE_PORT";
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let redis_url = std::env::var("REDIS_URL").expect("REDIS_URL not set");
-    let server_port = std::env::var("SERVER_PORT")
-        .expect("SERVER_PORT not set")
+    let redis_url = std::env::var(REDIS_URL).expect(&format!("{} not set", REDIS_URL));
+    let server_port = std::env::var(PORT)
+        .expect(&format!("{} not set", PORT))
         .parse()
         .expect("Cannot parse string");
     let redis = redis::Redis::configure().url(redis_url).create()?;

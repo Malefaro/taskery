@@ -7,7 +7,7 @@ macro_rules! loader {
         // use crate::models::*;
         // use crate::database::Database;
 
-        pub struct $name(pub Pin<Box<dyn Database + Send + Sync>>);
+        pub struct $name(pub Box<dyn Database + Send + Sync>);
 
         #[async_trait::async_trait]
         impl Loader<i32> for $name {
@@ -28,7 +28,7 @@ macro_rules! loader {
 #[macro_export]
 macro_rules! loader_related {
     ($name:ident, $model: ident, $method: ident) => {
-        pub struct $name(pub Pin<Box<dyn Database + Send + Sync>>);
+        pub struct $name(pub Box<dyn Database + Send + Sync>);
 
         #[async_trait::async_trait]
         impl Loader<i32> for $name {
@@ -48,13 +48,13 @@ macro_rules! loader_related {
 macro_rules! create_dataloader {
     ( $dataloader_name:ident, $(($field_name: ident, $loader: ident)),+ ) => {
         pub struct $dataloader_name {
-            pub db: Pin<Box<dyn Database + Send + Sync>>,
+            pub db: Box<dyn Database + Send + Sync>,
             $(
                 pub $field_name: DataLoader<$loader>,
             )+
         }
         impl $dataloader_name {
-            pub fn new(db: Pin<Box<dyn Database+Send+Sync>>) -> Self {
+            pub fn new(db: Box<dyn Database+Send+Sync>) -> Self {
                 Self{
                     $(
                         $field_name: DataLoader::new($loader(db.clone())),
