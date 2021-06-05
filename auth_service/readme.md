@@ -1,4 +1,5 @@
-# required environment variables
+# Auth service
 
-REDIS_URL
-SERVER_PORT
+**Required envs:**
+* REDIS_URL
+* AUTH_SERVICE_PORT
