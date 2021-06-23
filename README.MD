@@ -41,29 +41,29 @@ mutation {
 Query created models: 
 ```
 query {
-	companies(userId:1)
-  {
-    id, 
-    name, 
-    projects {
-      id, 
-      name, 
-      boards {
-        id,
+  companies(userId:1)
+    {
+        id, 
         name, 
-        columns {
-          id, 
-          name, 
-          tasks {
+        projects {
+        id, 
+        name, 
+        boards {
             id,
             name, 
-            tags {name},
-            resolved,
-          }
+            columns {
+            id, 
+            name, 
+            tasks {
+                id,
+                name, 
+                tags {name},
+                resolved,
+            }
+            }
         }
-      }
-    }
-  }  
+        }
+    }  
 }
 ```
 

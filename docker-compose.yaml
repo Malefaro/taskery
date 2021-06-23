@@ -1,16 +1,18 @@
 version: "3.9"
 services: 
     auth-service:
+        restart: on-failure
         build: 
             context: ./auth_service
             dockerfile: Dockerfile
         environment: 
-            SERVER_PORT: "5000"
+            AUTH_SERVICE_PORT: "5000"
             REDIS_URL: "redis://redis/"
         depends_on: 
             - redis
         
     graphql-server:
+        restart: on-failure
         build: 
             # context: ./graphql_server
             # dockerfile: Dockerfile
