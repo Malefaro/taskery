@@ -43,15 +43,15 @@ Query created models:
 query {
   companies(userId:1)
     {
-        id, 
-        name, 
-        projects {
+      id, 
+      name, 
+      projects {
         id, 
         name, 
         boards {
-            id,
-            name, 
-            columns {
+          id,
+          name, 
+          columns {
             id, 
             name, 
             tasks {
@@ -60,9 +60,9 @@ query {
                 tags {name},
                 resolved,
             }
-            }
+          }
         }
-        }
+      }
     }  
 }
 ```
