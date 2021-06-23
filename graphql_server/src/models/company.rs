@@ -1,6 +1,4 @@
-use async_graphql::{
-    dataloader::DataLoader, ComplexObject, Context, InputObject, Result as GQLResult, SimpleObject,
-};
+use async_graphql::{ComplexObject, Context, InputObject, Result as GQLResult, SimpleObject};
 use diesel::{Associations, Queryable};
 use serde::{Deserialize, Serialize};
 

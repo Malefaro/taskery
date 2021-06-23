@@ -17,7 +17,6 @@ pub mod loaders {
     };
     use async_graphql::{dataloader::Loader, FieldError};
     use std::collections::HashMap;
-    use std::pin::Pin;
 
     loader!(UserLoader, User, get_users_by_id_list);
     loader!(CompanyLoader, Company, get_companies_by_id_list);

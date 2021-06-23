@@ -1,11 +1,8 @@
-use async_graphql::{
-    dataloader::{DataLoader, Loader},
-    ComplexObject, Context, InputObject, Result as GQLResult, SimpleObject,
-};
+use async_graphql::{ComplexObject, Context, InputObject, Result as GQLResult, SimpleObject};
 use diesel::{Identifiable, Insertable, Queryable};
 use serde::{Deserialize, Serialize};
 
-use crate::{data_loader::Dataloader, database::postgres::PostgresDB};
+use crate::data_loader::Dataloader;
 
 use super::{diesel_schema::*, Company};
 #[derive(SimpleObject, Identifiable, Queryable, Serialize, Deserialize, Debug, Clone)]

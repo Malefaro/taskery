@@ -4,9 +4,7 @@ pub mod history;
 pub use comment::*;
 pub use history::*;
 
-use async_graphql::{
-    dataloader::DataLoader, ComplexObject, Context, InputObject, Result as GQLResult, SimpleObject,
-};
+use async_graphql::{ComplexObject, Context, InputObject, Result as GQLResult, SimpleObject};
 use chrono::NaiveDateTime;
 use diesel::{AsChangeset, Associations, Identifiable, Queryable};
 use serde::{Deserialize, Serialize};

@@ -1,6 +1,5 @@
+use async_graphql::SimpleObject;
 use chrono::NaiveDateTime;
-// use juniper::GraphQLObject;
-use async_graphql::{ComplexObject, Result as GQLResult, SimpleObject};
 use diesel::{Associations, Identifiable, Queryable};
 use serde::{Deserialize, Serialize};
 

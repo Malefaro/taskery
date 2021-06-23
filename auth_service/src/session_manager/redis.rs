@@ -9,6 +9,7 @@ pub struct RedisBuilder {
     db: Option<String>,
 }
 
+#[allow(dead_code)]
 impl RedisBuilder {
     pub fn url(mut self, url: String) -> Self {
         self.url = Some(url);

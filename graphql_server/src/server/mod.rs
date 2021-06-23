@@ -3,7 +3,6 @@ use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql::{EmptySubscription, Schema};
 use async_graphql_actix_web::{Request, Response};
 use auth_service::client::Client;
-use std::pin::Pin;
 use std::sync::Mutex;
 
 use crate::{

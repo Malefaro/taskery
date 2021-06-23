@@ -32,7 +32,7 @@ impl Client {
     }
     pub async fn logout(&mut self, token: String) -> Result<(), Box<dyn Error>> {
         let request = Request::new(Token { id: token });
-        Ok(self.client.delete(request).await?.map(|n| ()).into_inner())
+        Ok(self.client.delete(request).await?.map(|_| ()).into_inner())
     }
     pub async fn check_auth(&mut self, token: String) -> Result<i32, Box<dyn Error>> {
         let request = Request::new(Token { id: token });
